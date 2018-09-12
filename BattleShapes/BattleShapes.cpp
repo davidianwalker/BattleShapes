@@ -5,6 +5,7 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <cassert>
 
 // clib
 #include <stdio.h>
@@ -24,6 +25,7 @@
 #include "bullet.h"
 #include "primitives.h"
 #include "player.h"
+#include "render.h"
 
 Player player;
 AttackingShapes attacking_shapes;
@@ -128,18 +130,19 @@ int main() {
 	Screen screen(WIDTH, HEIGHT);
 	SDL_Window_Uptr window{ make_window(screen) };
 	SDL_Renderer_Uptr renderer{ make_renderer(window.get()) };
-	SDL_Texture_Uptr player_texture{ make_texture(renderer.get(), "resources/playermclaren.png") };
+	SDL_Texture_Uptr tmp_player_texture{ make_texture(renderer.get(), "resources/playermclaren.png") };
 	
 	std::string font_name = "resources/OpenSans-Regular.ttf";
 	auto font = load_font(font_name);
-	const SDL_Color black = { 0, 0, 0 };
+
 
 	// Init game objects
 	// --------------------------------------------------------------------------
 	auto background_rect = SDL_Rect{ 0, 0, screen.width, screen.height };
 	attacking_shapes.init();
 	bullets.init();
-	player.init(screen.center.x, screen.center.y);
+	player.init(std::move(tmp_player_texture), screen.center.x, screen.center.y);
+	assert(tmp_player_texture == nullptr);
 
 	// Run the game loop.
 	// ------------------------------------------------------------------------
@@ -168,32 +171,12 @@ int main() {
 		SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderFillRect(renderer.get(), &background_rect);
 
-		// Render the player.
-		SDL_RenderCopyEx(renderer.get(), player_texture.get(), NULL, &player.rect, player.theta * 180 / 3.14, nullptr, SDL_FLIP_NONE);
-
-		// Render the attacking shapes.
-		for (auto& shape : attacking_shapes.shapes) {
-			if (shape.visibility) {
-				SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0x00, 0x00, 0xFF);
-				SDL_RenderFillRect(renderer.get(), &shape.rect);
-			}
-		}
-
-		// Render the bullets.
-		for (int v = 0; v < 5; ++v) {
-			if (bullets.visibility[v] == 1) {
-				auto& bullet = bullets.bullets [v];
-				SDL_SetRenderDrawColor(renderer.get(), 0x00, 0xFF, 0x00, 0xFF);
-				SDL_RenderFillRect(renderer.get(), &bullet.rect);
-			}
-		}
-
-		//Render the score.
-		auto font_surface = font_create_surface(font.get(), std::to_string(total_score), black);
-		auto font_texture = font_create_texture(font_surface.get(), renderer.get());
-
-		SDL_Rect dst{ 0, 0, font_surface->w, font_surface->h };
-		SDL_RenderCopy(renderer.get(), font_texture.get(), nullptr, &dst);
+		// Render the objects.
+		// See render.h for explanation to why render is not a member function of the objects.
+		render(renderer.get(), attacking_shapes);
+		render(renderer.get(), bullets);
+		render(renderer.get(), player);
+		render_score(renderer.get(), font.get(), total_score);
 
 		// Update the screen with rendering actions
 		SDL_RenderPresent(renderer.get());

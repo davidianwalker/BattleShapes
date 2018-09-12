@@ -1,7 +1,9 @@
 #include "player.h"
 #include "stdio.h"
 
-void Player::init(int origin_x, int origin_y) {
+void Player::init(SDL_Texture_Uptr texture, int origin_x, int origin_y) {
+	this->texture = std::move(texture);
+
     int w = this->rect.w;
     int h = this->rect.h;
 	this->pos.x = origin_x - w / 2.0f;

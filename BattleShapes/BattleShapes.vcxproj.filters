@@ -39,6 +39,12 @@
     <ClInclude Include="sdl_callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdl_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="attacking_shape.cpp">

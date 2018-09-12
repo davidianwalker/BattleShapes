@@ -162,8 +162,10 @@
     <ClInclude Include="game_rect.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="primitives.h" />
+    <ClInclude Include="render.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="sdl_callbacks.h" />
+    <ClInclude Include="sdl_types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="attacking_shape.cpp" />
