@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="attacking_shape.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="collision.h" />
     <ClInclude Include="game_rect.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="primitives.h" />

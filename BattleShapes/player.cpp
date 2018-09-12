@@ -1,15 +1,19 @@
 #include "player.h"
 #include "stdio.h"
 
-void Player::init(SDL_Texture_Uptr texture, int origin_x, int origin_y) {
+void Player::init(SDL_Texture_Uptr texture, SDL_Point const& center) {
 	this->texture = std::move(texture);
 
-    int w = this->rect.w;
-    int h = this->rect.h;
-	this->pos.x = origin_x - w / 2.0f;
-	this->pos.y = origin_y - h / 2.0f;
-	this->rect.x = origin_x - w / 2;
-	this->rect.y = origin_y - h / 2;
+	auto x = center.x;
+	auto y = center.y;
+    auto w = this->rect.w / 2.0f;
+    auto h = this->rect.h / 2.0f;
+	this->pos.x = x - w;
+	this->pos.y = y - h;
+
+	// +0.5f because casting to int always rounds down.
+	this->rect.x = static_cast<int>((x - w) + 0.5f);
+	this->rect.y = static_cast<int>((y - h) + 0.5f);
 }
 
 void Player::tick() {
@@ -17,7 +21,6 @@ void Player::tick() {
     if (this->rotation_direction & 0x01) { direction -= 1; }
     if (this->rotation_direction & 0x02) { direction += 1; }
     if (direction != 0) {
-		this->theta += (direction * 0.1f);
-        printf("theta: %f\n", this->theta);
+		this->theta += (direction * 0.1f); 
     }
 }

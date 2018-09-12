@@ -11,14 +11,14 @@ void AttackingShape::init() {
                36.0f;  // 10 starting points about the circle seems enough.
   auto theta = angle * RADIANS;
 
-  auto r = gScreen.height / 2;
+  auto r = gScreen.height / 2.0f;
   auto cart = std::polar<float>(r, theta);
-  printf("theta %f  ", theta);
+  // printf("theta %f  ", theta);
 
   auto x = gScreen.center.x + cart.real() - 16.0f;
   auto y = gScreen.center.y + cart.imag() - 16.0f;
-  printf("x %f  ", x);
-  printf("y %f\n", y);
+  // printf("x %f  ", x);
+  // printf("y %f\n", y);
 
   auto itheta = atan2(gScreen.center.y - 16 - y, gScreen.center.x - 16 - x);
   if (itheta < 0.0) {
@@ -28,8 +28,8 @@ void AttackingShape::init() {
   this->pos.x = x;
   this->pos.y = y;
   this->theta = itheta;
-  this->rect.x = round(x);
-  this->rect.y = round(y);
+  this->rect.x = static_cast<int>(x + 0.5f);
+  this->rect.y = static_cast<int>(y + 0.5f);
   this->visibility = true;
 }
 
@@ -39,8 +39,8 @@ void AttackingShape::tick() {
     auto dy = 1.0f * sin(this->theta);
 	this->pos.x += dx;
 	this->pos.y += dy;
-	this->rect.x = round(this->pos.x);
-	this->rect.y = round(this->pos.y);
+	this->rect.x = static_cast<int>(this->pos.x + 0.5f );
+	this->rect.y = static_cast<int>(this->pos.y + 0.5f);
 }
 
 // ----------------------------------------------------------------------------

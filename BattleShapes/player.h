@@ -12,7 +12,7 @@ struct Player {
     uint8_t rotation_direction;
 	SDL_Texture_Uptr texture{ nullptr, SDL_DestroyTexture };
 
-	void init(SDL_Texture_Uptr texture, int origin_x, int origin_y);
+	void init(SDL_Texture_Uptr texture, SDL_Point const& center);
 	void tick();
 };
 

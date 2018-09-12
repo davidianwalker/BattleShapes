@@ -26,16 +26,21 @@
 #include "primitives.h"
 #include "player.h"
 #include "render.h"
+#include "collision.h"
 
+
+// Bullets and Player need to be global because I am lazy and don't want to
+// refactor how the player input works.
 Player player;
-AttackingShapes attacking_shapes;
 Bullets bullets;
+AttackingShapes attacking_shapes;
 
 
 void on_fire() {
 	// +180 to get the bullets to fire off in the oposite direction.
 	// +90 because our player image points up, but 0 degrees is to the right.
-	auto angle = player.theta + 3.14 + 1.57;
+	constexpr auto bullet_angle_offset = 3.14f + 1.57f;
+	auto angle = player.theta + bullet_angle_offset;
 	bullets.fire(angle);
 }
 
@@ -64,67 +69,10 @@ void on_right_released() {
 }
 
 
-bool is_collision(SDL_Rect& rect1, SDL_Rect& rect2) {
-	return (rect1.x < rect2.x + rect2.w && rect1.x + rect1.w > rect2.x &&
-		rect1.y < rect2.y + rect2.h && rect1.h + rect1.y > rect2.y);
-}
-
-
-int check_collisions(std::array<Bullet, 5> &bullets, std::array<int, 5> &visibility, std::array<AttackingShape, 5> &attacking_shapes) {
-	int count = 0;
-	for (int v = 0; v < 5; ++v) {
-		if (visibility[v] == 1) {
-			auto& bullet = bullets[v];
-
-			for (auto& shape : attacking_shapes) {
-				if (shape.visibility) {
-					if (is_collision(bullet.rect, shape.rect)) {
-						shape.visibility = false;
-						visibility[v] = 0;
-						++count;
-					}
-				}
-			}
-		}
-	}
-	return count;
-}
-
-
-bool check_collisions(Player &player, std::array<AttackingShape, 5> &attacking_shapes) {
-	auto player_hit = false;
-	for (auto& shape : attacking_shapes) {
-		if (is_collision(player.rect, shape.rect)) {
-			player_hit = true;
-		}
-	}
-	return player_hit;
-}
-
-void check_is_in_window_rect(SDL_Rect &window, AttackingShapes &attacking_shapes) {
-	for (auto &shape : attacking_shapes.shapes) {
-		if (shape.visibility && !is_collision(shape.rect, window)) {
-			shape.visibility = false;
-			printf("Killing shape. x: %f y:%f\n", shape.pos.x, shape.pos.y);
-		}
-	}
-}
-
-void check_is_in_window_rect(SDL_Rect &window, Bullets &bullets) {
-	for (int i = 0; i < bullets.visibility.size(); ++i) {
-		auto &visibilty = bullets.visibility[i];
-		if (visibilty == 1 && !is_collision(bullets.bullets[i].rect, window)) {
-			visibilty = 0;
-			printf("Killing bullet.\n");
-		}
-	}
-}
-
-
 int main() {
 	srand(time(nullptr));
 	sdl_init();
-	int total_score = 0;
+	auto total_score = 0;
 
 	// LESSION: Ownership transfer.
 	Screen screen(WIDTH, HEIGHT);
@@ -135,47 +83,54 @@ int main() {
 	std::string font_name = "resources/OpenSans-Regular.ttf";
 	auto font = load_font(font_name);
 
-
 	// Init game objects
 	// --------------------------------------------------------------------------
 	auto background_rect = SDL_Rect{ 0, 0, screen.width, screen.height };
 	attacking_shapes.init();
 	bullets.init();
-	player.init(std::move(tmp_player_texture), screen.center.x, screen.center.y);
+	player.init(std::move(tmp_player_texture), screen.center);
 	assert(tmp_player_texture == nullptr);
 
 	// Run the game loop.
 	// ------------------------------------------------------------------------
 	for (int i = 0; i < 500; i++) {
 		fflush(stdout);
-		// LESSION: Callbacks should be lambdas to pass through data by capture.
+		// Handle player input.
+		// --------------------------------------------------------------------
 		sdl_handle_input(on_fire, on_left_pressed, on_right_pressed, on_left_released, on_right_released);
 
-		// Update each of the game objects.
+		// Update game objects.
+		// --------------------------------------------------------------------
 		player.tick();
 		attacking_shapes.tick();
 		bullets.tick();
 
-		total_score += check_collisions(bullets.bullets, bullets.visibility, attacking_shapes.shapes);
-		if (check_collisions(player, attacking_shapes.shapes)) {
+		// Check collisions
+		// See collision.h for explanation for why these aren't member 
+		// functions.
+		// Note, lambda functions are used for customisation points.
+		// --------------------------------------------------------------------
+		check_collisions(bullets, attacking_shapes, [&total_score]() {
+			total_score += 1;
+		});
+		check_collisions(player, attacking_shapes, [&total_score]() {
 			total_score = 0;
-		}
+		});
 
 		check_is_in_window_rect(background_rect, attacking_shapes);
 		check_is_in_window_rect(background_rect, bullets);
 
-		// Render the game objects
-		// --------------------------------------------------------------------------
-
+ 		// Render the game objects
+		// --------------------------------------------------------------------
 		// Clear the screen
 		SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderFillRect(renderer.get(), &background_rect);
 
 		// Render the objects.
 		// See render.h for explanation to why render is not a member function of the objects.
+		render(renderer.get(), player);
 		render(renderer.get(), attacking_shapes);
 		render(renderer.get(), bullets);
-		render(renderer.get(), player);
 		render_score(renderer.get(), font.get(), total_score);
 
 		// Update the screen with rendering actions
