@@ -18,7 +18,8 @@ struct Screen {
 	const SDL_Point center;
 };
 
-extern Screen gScreen;
+constexpr const Screen gScreen{ WIDTH, HEIGHT };
+
 
 #endif // SCREEN_H
 

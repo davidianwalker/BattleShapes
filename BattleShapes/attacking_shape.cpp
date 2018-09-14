@@ -4,10 +4,8 @@
 #include <tuple>
 #include "screen.h"
 
-constexpr const auto pi = 3.141592f;
-constexpr const auto RADIANS = pi / 180.0f;
 
-std::tuple<float, float, float> calcualte_starting_pos() {
+std::tuple<float, float, float> calculate_starting_pos() {
 	auto angle = (rand() % 10) *
 		36.0f;  // 10 starting points about the circle seems enough.
 	auto theta = angle * RADIANS;
@@ -27,9 +25,16 @@ std::tuple<float, float, float> calcualte_starting_pos() {
 }
 
 
-void AttackingShape::init() {
+StartingPos AttackingShapes::get_starting_pos() {
+	auto pos = static_cast<int>(rand() % 10);
+	return this->table.values[pos];
+}
+
+
+
+void AttackingShape::init(StartingPos const& pos) {
 	float x, y, itheta;
-	std::tie(x, y, itheta) = calcualte_starting_pos();
+	std::tie(x, y, itheta) = pos;
 	this->pos.x = x;
 	this->pos.y = y;
 	this->theta = itheta;
@@ -68,7 +73,7 @@ void AttackingShapes::tick() {
 		});
 
 		if (it != shapes.end()) {
-			it->init();
+			it->init(this->get_starting_pos());
 		}
 
 		count_down = 100;
