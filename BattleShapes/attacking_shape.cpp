@@ -67,13 +67,17 @@ void AttackingShapes::init() {
 
 void AttackingShapes::tick() {
 	if (--count_down <= 0) {
-		// Make shape alive.
-		auto it = std::find_if(shapes.begin(), shapes.end(), [](const AttackingShape& shape) {
-			return !shape.visibility;
-		});
+		// PRACTICAL 2 - Using std::algorithm to replace a for-loop.
+		for (auto& shape : this->shapes) {
+			if (shape.visibility == false) {
+				// Generate the staring positions at run time.
+				shape.init(calculate_starting_pos());
 
-		if (it != shapes.end()) {
-			it->init(this->get_starting_pos());
+				// PRACTICAL 6 - using constexpr to calculate positions at compile time.
+				// Generate the starting positions at compile time - this doesn't work yet!
+				// shape.init(this->get_starting_pos());
+				break;
+			}
 		}
 
 		count_down = 100;
