@@ -45,7 +45,8 @@ void Bullets::tick() {
 
 
 void Bullets::fire(float theta) {
-	// PRATICAL 1: Updating a C-style for loop.
+	// PRACTICAL 1: Updating a C-style for loop.
+	// PRACTICAL 5: Data Oriented Design.
 	for (auto i = 1; i < 5; ++i) {
 		if (this->bullets[i].visible == false) {
 			this->bullets[i].init(gScreen.center, theta);
