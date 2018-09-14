@@ -9,19 +9,19 @@ struct Bullet {
     Pos pos = {0, 0};
     float theta = 0;
     SDL_Rect rect = {0, 0, 16, 16}; // x, y, w h
+	bool visible = false;
+
+	void init(SDL_Point const&center, float theta);
+	void tick();
+	void kill();
 };
 
-void bullet_init(Bullet& rect, SDL_Point const&center);
-
-void bullet_tick(Bullet& bullet);
 
 struct Bullets {
 	std::array<Bullet, 5> bullets;
-	std::array<int, 5> visibility;
 
 	void init();
 	void tick();
-
 	void fire(float theta);
 };
 

@@ -13,6 +13,7 @@ struct AttackingShape {
 
 	void init();
 	void tick();
+	void kill();
 };
 
 struct AttackingShapes {

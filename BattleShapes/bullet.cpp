@@ -1,47 +1,53 @@
  #include "bullet.h"
 #include "screen.h"
 
-void bullet_init(Bullet& bullet, SDL_Point const&center) {
-    int w = bullet.rect.w;
-    int h = bullet.rect.h;
-    bullet.pos.x = center.x - w / 2.0f;
-    bullet.pos.y = center.y - h / 2.0f;
-    bullet.rect.x = center.x - w / 2;
-    bullet.rect.y = center.y - h / 2;
+void Bullet::init(SDL_Point const&center, float theta) {
+	this->visible = true;
+	this->theta = theta;
+
+	int w = this->rect.w;
+    int h = this->rect.h;
+	// We need pos because SDL_Rect coordinates are ints. 
+	// The change in position per update is < 1 therefore the truncation that 
+	// would occur casting to int would mean the bullets wouldn't go anywhere!
+	this->pos.x = center.x - w / 2.0f;
+	this->pos.y = center.y - h / 2.0f;
+	this->rect.x = center.x - w / 2;
+	this->rect.y = center.y - h / 2;
 }
 
-void bullet_tick(Bullet &bullet) {
-    float dx = static_cast<float>(1.0 * cos(bullet.theta));
-    float dy = static_cast<float>(1.0 * sin(bullet.theta));
-    bullet.pos.x += dx*1.5;
-    bullet.pos.y += dy*1.5;
-    bullet.rect.x = static_cast<int>(bullet.pos.x);
-    bullet.rect.y = static_cast<int>(bullet.pos.y);
+void Bullet::tick() {
+	// We need pos because SDL_Rect coordinates are ints. 
+	// The change in position per update is < 1 therefore the truncation that 
+	// would occur casting to int would mean the bullets wouldn't go anywhere!
+	float dx = static_cast<float>(1.0 * cos(this->theta));
+    float dy = static_cast<float>(1.0 * sin(this->theta));
+	this->pos.x += dx*1.5;
+	this->pos.y += dy*1.5;
+	this->rect.x = static_cast<int>(this->pos.x);
+	this->rect.y = static_cast<int>(this->pos.y);
 }
 
-void Bullets::init() {
-	for (auto& v : this->visibility) {
-		v = 0;
-	}
+void Bullet::kill() {
+	this->visible = false;
 }
+
+void Bullets::init() { }
 
 
 void Bullets::tick() {
-	for (int v = 0; v < 5; ++v) {
-		if (this->visibility[v] == 1) {
-			auto& bullet = this->bullets[v];
-			bullet_tick(bullet);
+	for (auto& bullet : this->bullets) {
+		if (bullet.visible) {
+			bullet.tick();
 		}
 	}
 }
 
 
 void Bullets::fire(float theta) {
-	for (int i = 0; i < this->visibility.size(); ++i) {
-		if (this->visibility[i] == 0) {
-			this->visibility[i] = 1;
-			bullet_init(this->bullets[i], gScreen.center);
-			this->bullets[i].theta = theta;
+	for (auto& bullet : this->bullets) {
+		if (bullet.visible == false) {
+			bullet.init(gScreen.center, theta);
 			break;
 		}
 	}

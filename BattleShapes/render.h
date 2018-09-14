@@ -13,9 +13,8 @@
 
 
 inline void render(SDL_Renderer* renderer, Bullets const& bullets) {
-	for (int v = 0; v < 5; ++v) {
-		if (bullets.visibility[v] == 1) {
-			auto& bullet = bullets.bullets[v];
+	for (auto& bullet : bullets.bullets) {
+		if (bullet.visible) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
 			SDL_RenderFillRect(renderer, &bullet.rect);
 		}

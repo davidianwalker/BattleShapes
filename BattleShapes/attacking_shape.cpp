@@ -13,12 +13,9 @@ void AttackingShape::init() {
 
   auto r = gScreen.height / 2.0f;
   auto cart = std::polar<float>(r, theta);
-  // printf("theta %f  ", theta);
 
   auto x = gScreen.center.x + cart.real() - 16.0f;
   auto y = gScreen.center.y + cart.imag() - 16.0f;
-  // printf("x %f  ", x);
-  // printf("y %f\n", y);
 
   auto itheta = atan2(gScreen.center.y - 16 - y, gScreen.center.x - 16 - x);
   if (itheta < 0.0) {
@@ -41,6 +38,10 @@ void AttackingShape::tick() {
 	this->pos.y += dy;
 	this->rect.x = static_cast<int>(this->pos.x + 0.5f );
 	this->rect.y = static_cast<int>(this->pos.y + 0.5f);
+}
+
+void AttackingShape::kill() {
+	this->visibility = false;
 }
 
 // ----------------------------------------------------------------------------

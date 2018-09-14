@@ -15,16 +15,13 @@ right.
 
 template <typename Callable>
 void check_collisions(Bullets &bullets, AttackingShapes &attacking_shapes, Callable on_bullet_hit_shape) {
-	for (int v = 0; v < 5; ++v) {
-		auto& visibility = bullets.visibility[v];
-		if (visibility == 1) {
-			auto& bullet = bullets.bullets[v];
-
+	for (auto& bullet : bullets.bullets) {
+		if (bullet.visible) {
 			for (auto& shape : attacking_shapes.shapes) {
 				if (shape.visibility) {
 					if (SDL_HasIntersection(&bullet.rect, &shape.rect)) {
-						shape.visibility = false;
-						visibility = 0;
+						shape.kill();
+						bullet.kill();
 						on_bullet_hit_shape();
 					}
 				}
@@ -55,11 +52,9 @@ void check_is_in_window_rect(SDL_Rect &window, AttackingShapes &attacking_shapes
 
 
 void check_is_in_window_rect(SDL_Rect &window, Bullets &bullets) {
-	for (int i = 0; i < bullets.visibility.size(); ++i) {
-		auto &visibilty = bullets.visibility[i];
-		if (visibilty == 1 && !SDL_HasIntersection(&bullets.bullets[i].rect, &window)) {
-			visibilty = 0;
-			printf("Killing bullet.\n");
+	for (auto& bullet : bullets.bullets) {
+		if (bullet.visible && !SDL_HasIntersection(&bullet.rect, &window)) {
+			bullet.kill();
 		}
 	}
 }
