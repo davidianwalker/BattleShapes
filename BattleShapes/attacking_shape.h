@@ -21,20 +21,9 @@ struct Table
 		auto angle = 0.0f;
 
 		for (auto &value : values) {
-			auto theta = angle * RADIANS;
+			// TODO: This is incomplete - look at calculate_starting_pos for hints.
 
-			auto r = gScreen.height / 2.0f;
-			auto cart = std::polar<float>(r, theta);
-
-			auto x = gScreen.center.x + cart.real() - 16.0f;
-			auto y = gScreen.center.y + cart.imag() - 16.0f;
-
-			auto itheta = atan2(gScreen.center.y - 16 - y, gScreen.center.x - 16 - x);
-			if (itheta < 0.0) {
-				itheta += (2 * pi);
-			}
-
-			value = std::make_tuple(x, y, itheta);
+			value = std::make_tuple(0, 0, 0);
 			angle += ANGLE_PER_POS;
 		}
 	}
