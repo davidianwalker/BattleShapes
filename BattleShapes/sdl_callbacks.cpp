@@ -65,7 +65,7 @@ SDL_Window_Uptr make_window(Screen &screen)
 }
 
 
-SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *renderer) {
+SDL_Texture* sdl_load_texture(const std::string& path, SDL_Renderer *renderer) {
     SDL_Texture* new_texture = nullptr;
 
     // Load image at specified path
@@ -78,6 +78,7 @@ SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *rendere
         if (new_texture == nullptr) {
             auto msg = std::string("Unable to create texture from: ") + path;
             sdl_print_error(msg.c_str());
+			exit(-4);
         }
 
         //Get rid of old loaded surface
@@ -88,18 +89,7 @@ SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *rendere
 		sdl_print_image_error(msg.c_str());
 	}
 
-	return { new_texture, SDL_DestroyTexture };
-}
-
-
-SDL_Texture_Uptr make_texture(SDL_Renderer *renderer, std::string const& filename) {
-	SDL_Texture_Uptr texture = sdl_load_texture(filename, renderer);
-	if (texture == nullptr) {
-		printf("Failed to load image: %s\n", filename.c_str());
-		exit(-4);
-	}
-
-	return texture;
+	return new_texture;
 }
 
 

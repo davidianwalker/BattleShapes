@@ -1,0 +1,122 @@
+[1mdiff --git a/BattleShapes/BattleShapes.cpp b/BattleShapes/BattleShapes.cpp[m
+[1mindex 8798b71..7fe63f8 100644[m
+[1m--- a/BattleShapes/BattleShapes.cpp[m
+[1m+++ b/BattleShapes/BattleShapes.cpp[m
+[36m@@ -78,7 +78,7 @@[m [mint main() {[m
+ 	Screen screen(WIDTH, HEIGHT);[m
+ 	SDL_Window_Uptr window{ make_window(screen) };[m
+ 	SDL_Renderer_Uptr renderer{ make_renderer(window.get()) };[m
+[31m-	SDL_Texture_Uptr tmp_player_texture{ make_texture(renderer.get(), "resources/playermclaren.png") };[m
+[32m+[m	[32mSDL_Texture* player_texture{ sdl_load_texture("resources/playermclaren.png", renderer.get()) };[m
+ 	[m
+ 	std::string font_name = "resources/OpenSans-Regular.ttf";[m
+ 	auto font = load_font(font_name);[m
+[36m@@ -88,8 +88,7 @@[m [mint main() {[m
+ 	auto background_rect = SDL_Rect{ 0, 0, screen.width, screen.height };[m
+ 	attacking_shapes.init();[m
+ 	bullets.init();[m
+[31m-	player.init(std::move(tmp_player_texture), screen.center);[m
+[31m-	assert(tmp_player_texture == nullptr);[m
+[32m+[m	[32mplayer.init(player_texture, screen.center);[m
+ [m
+ 	// Run the game loop.[m
+ 	// ------------------------------------------------------------------------[m
+[1mdiff --git a/BattleShapes/player.cpp b/BattleShapes/player.cpp[m
+[1mindex 50c8a04..ddc157f 100644[m
+[1m--- a/BattleShapes/player.cpp[m
+[1m+++ b/BattleShapes/player.cpp[m
+[36m@@ -1,8 +1,8 @@[m
+ #include "player.h"[m
+ #include "stdio.h"[m
+ [m
+[31m-void Player::init(SDL_Texture_Uptr texture, SDL_Point const& center) {[m
+[31m-	this->texture = std::move(texture);[m
+[32m+[m[32mvoid Player::init(SDL_Texture* texture, SDL_Point const& center) {[m
+[32m+[m	[32mthis->texture = texture;[m
+ [m
+ 	auto x = center.x;[m
+ 	auto y = center.y;[m
+[1mdiff --git a/BattleShapes/player.h b/BattleShapes/player.h[m
+[1mindex a9f8b2e..d1f58ba 100644[m
+[1m--- a/BattleShapes/player.h[m
+[1m+++ b/BattleShapes/player.h[m
+[36m@@ -10,9 +10,9 @@[m [mstruct Player {[m
+     float theta = 0;[m
+     SDL_Rect rect = {0, 0, 32, 32}; // x, y, w h[m
+     uint8_t rotation_direction;[m
+[31m-	SDL_Texture_Uptr texture{ nullptr, SDL_DestroyTexture };[m
+[32m+[m	[32mSDL_Texture* texture{ nullptr };[m
+ [m
+[31m-	void init(SDL_Texture_Uptr texture, SDL_Point const& center);[m
+[32m+[m	[32mvoid init(SDL_Texture* texture, SDL_Point const& center);[m
+ 	void tick();[m
+ };[m
+ [m
+[1mdiff --git a/BattleShapes/render.h b/BattleShapes/render.h[m
+[1mindex 02ceb3a..334be20 100644[m
+[1m--- a/BattleShapes/render.h[m
+[1m+++ b/BattleShapes/render.h[m
+[36m@@ -33,7 +33,7 @@[m [minline void render(SDL_Renderer* renderer, AttackingShapes const& attacking_shap[m
+ [m
+ inline void render(SDL_Renderer* renderer, Player const& player) {[m
+ 	SDL_RenderCopyEx(renderer, [m
+[31m-		player.texture.get(), [m
+[32m+[m		[32mplayer.texture,[m[41m [m
+ 		NULL, [m
+ 		&player.rect,[m
+ 		player.theta * 180 / 3.14, [m
+[1mdiff --git a/BattleShapes/sdl_callbacks.cpp b/BattleShapes/sdl_callbacks.cpp[m
+[1mindex 6c31d80..d9e9b27 100644[m
+[1m--- a/BattleShapes/sdl_callbacks.cpp[m
+[1m+++ b/BattleShapes/sdl_callbacks.cpp[m
+[36m@@ -65,7 +65,7 @@[m [mSDL_Window_Uptr make_window(Screen &screen)[m
+ }[m
+ [m
+ [m
+[31m-SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *renderer) {[m
+[32m+[m[32mSDL_Texture* sdl_load_texture(const std::string& path, SDL_Renderer *renderer) {[m
+     SDL_Texture* new_texture = nullptr;[m
+ [m
+     // Load image at specified path[m
+[36m@@ -78,6 +78,7 @@[m [mSDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *rendere[m
+         if (new_texture == nullptr) {[m
+             auto msg = std::string("Unable to create texture from: ") + path;[m
+             sdl_print_error(msg.c_str());[m
+[32m+[m			[32mexit(-4);[m
+         }[m
+ [m
+         //Get rid of old loaded surface[m
+[36m@@ -88,18 +89,7 @@[m [mSDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *rendere[m
+ 		sdl_print_image_error(msg.c_str());[m
+ 	}[m
+ [m
+[31m-	return { new_texture, SDL_DestroyTexture };[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-SDL_Texture_Uptr make_texture(SDL_Renderer *renderer, std::string const& filename) {[m
+[31m-	SDL_Texture_Uptr texture = sdl_load_texture(filename, renderer);[m
+[31m-	if (texture == nullptr) {[m
+[31m-		printf("Failed to load image: %s\n", filename.c_str());[m
+[31m-		exit(-4);[m
+[31m-	}[m
+[31m-[m
+[31m-	return texture;[m
+[32m+[m	[32mreturn new_texture;[m
+ }[m
+ [m
+ [m
+[1mdiff --git a/BattleShapes/sdl_callbacks.h b/BattleShapes/sdl_callbacks.h[m
+[1mindex 9f44378..49c1346 100644[m
+[1m--- a/BattleShapes/sdl_callbacks.h[m
+[1m+++ b/BattleShapes/sdl_callbacks.h[m
+[36m@@ -23,8 +23,7 @@[m [mSDL_Window_Uptr make_window(Screen &screen);[m
+ [m
+ SDL_Renderer_Uptr make_renderer(SDL_Window* window);[m
+ [m
+[31m-SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *renderer);[m
+[31m-SDL_Texture_Uptr make_texture(SDL_Renderer *renderer, std::string const& filename);[m
+[32m+[m[32mSDL_Texture* sdl_load_texture(const std::string& path, SDL_Renderer *renderer);[m
+ [m
+ TTF_Font_Uptr load_font(std::string const& font);[m
+ [m

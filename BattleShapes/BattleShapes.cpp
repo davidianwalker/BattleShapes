@@ -78,7 +78,8 @@ int main() {
 	Screen screen(WIDTH, HEIGHT);
 	SDL_Window_Uptr window{ make_window(screen) };
 	SDL_Renderer_Uptr renderer{ make_renderer(window.get()) };
-	SDL_Texture_Uptr tmp_player_texture{ make_texture(renderer.get(), "resources/playermclaren.png") };
+	// PRACTICAL 3: Using std::unique_ptr.
+	SDL_Texture* player_texture{ sdl_load_texture("resources/playermclaren.png", renderer.get()) };
 	
 	std::string font_name = "resources/OpenSans-Regular.ttf";
 	auto font = load_font(font_name);
@@ -88,8 +89,7 @@ int main() {
 	auto background_rect = SDL_Rect{ 0, 0, screen.width, screen.height };
 	attacking_shapes.init();
 	bullets.init();
-	player.init(std::move(tmp_player_texture), screen.center);
-	assert(tmp_player_texture == nullptr);
+	player.init(player_texture, screen.center);
 
 	// Run the game loop.
 	// ------------------------------------------------------------------------

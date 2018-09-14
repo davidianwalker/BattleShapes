@@ -10,9 +10,9 @@ struct Player {
     float theta = 0;
     SDL_Rect rect = {0, 0, 32, 32}; // x, y, w h
     uint8_t rotation_direction;
-	SDL_Texture_Uptr texture{ nullptr, SDL_DestroyTexture };
+	SDL_Texture* texture{ nullptr };
 
-	void init(SDL_Texture_Uptr texture, SDL_Point const& center);
+	void init(SDL_Texture* texture, SDL_Point const& center);
 	void tick();
 };
 

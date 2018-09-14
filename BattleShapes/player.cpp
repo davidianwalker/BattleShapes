@@ -1,8 +1,8 @@
 #include "player.h"
 #include "stdio.h"
 
-void Player::init(SDL_Texture_Uptr texture, SDL_Point const& center) {
-	this->texture = std::move(texture);
+void Player::init(SDL_Texture* texture, SDL_Point const& center) {
+	this->texture = texture;
 
 	auto x = center.x;
 	auto y = center.y;

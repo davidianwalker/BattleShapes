@@ -23,8 +23,7 @@ SDL_Window_Uptr make_window(Screen &screen);
 
 SDL_Renderer_Uptr make_renderer(SDL_Window* window);
 
-SDL_Texture_Uptr sdl_load_texture(const std::string& path, SDL_Renderer *renderer);
-SDL_Texture_Uptr make_texture(SDL_Renderer *renderer, std::string const& filename);
+SDL_Texture* sdl_load_texture(const std::string& path, SDL_Renderer *renderer);
 
 TTF_Font_Uptr load_font(std::string const& font);
 

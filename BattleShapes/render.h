@@ -33,7 +33,7 @@ inline void render(SDL_Renderer* renderer, AttackingShapes const& attacking_shap
 
 inline void render(SDL_Renderer* renderer, Player const& player) {
 	SDL_RenderCopyEx(renderer, 
-		player.texture.get(), 
+		player.texture, 
 		NULL, 
 		&player.rect,
 		player.theta * 180 / 3.14, 
