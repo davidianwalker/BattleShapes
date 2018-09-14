@@ -18,7 +18,7 @@ struct Bullet {
 
 
 struct Bullets {
-	std::array<Bullet, 5> bullets;
+	Bullet bullets[5];
 
 	void init();
 	void tick();

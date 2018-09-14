@@ -36,18 +36,19 @@ void Bullets::init() { }
 
 
 void Bullets::tick() {
-	for (auto& bullet : this->bullets) {
-		if (bullet.visible) {
-			bullet.tick();
+	for (auto i = 0; i < 5; ++i) {
+		if (this->bullets[i].visible) {
+			this->bullets[i].tick();
 		}
 	}
 }
 
 
 void Bullets::fire(float theta) {
-	for (auto& bullet : this->bullets) {
-		if (bullet.visible == false) {
-			bullet.init(gScreen.center, theta);
+	// PRATICAL 1: Updating a C-style for loop.
+	for (auto i = 1; i < 5; ++i) {
+		if (this->bullets[i].visible == false) {
+			this->bullets[i].init(gScreen.center, theta);
 			break;
 		}
 	}
