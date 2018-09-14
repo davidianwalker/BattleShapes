@@ -15,31 +15,19 @@ right.
 
 template <typename Callable>
 void check_collisions(Bullets &bullets, AttackingShapes &attacking_shapes, Callable on_bullet_hit_shape) {
-	for (auto it = bullets.first; it != bullets.bullets.end(); ++it) {
-		for (auto& shape : attacking_shapes.shapes) {
-			if (shape.visibility) {
-				if (SDL_HasIntersection(&it->rect, &shape.rect)) {
-					shape.kill();
-					bullets.kill(it);
-					on_bullet_hit_shape();
+	for (auto& bullet : bullets.bullets) {
+		if (bullet.visible) {
+			for (auto& shape : attacking_shapes.shapes) {
+				if (shape.visibility) {
+					if (SDL_HasIntersection(&bullet.rect, &shape.rect)) {
+						shape.kill();
+						bullet.kill();
+						on_bullet_hit_shape();
+					}
 				}
 			}
 		}
 	}
-
-	//for (auto& bullet : bullets.bullets) {
-	//	if (bullet.visible) {
-	//		for (auto& shape : attacking_shapes.shapes) {
-	//			if (shape.visibility) {
-	//				if (SDL_HasIntersection(&bullet.rect, &shape.rect)) {
-	//					shape.kill();
-	//					bullet.kill();
-	//					on_bullet_hit_shape();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
 }
 
 

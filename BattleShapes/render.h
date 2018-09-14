@@ -13,16 +13,12 @@
 
 
 inline void render(SDL_Renderer* renderer, Bullets const& bullets) {
-	for (auto it = bullets.first; it != bullets.bullets.end(); ++it) {
-		SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
-		SDL_RenderFillRect(renderer, &it->rect);
+	for (auto& bullet : bullets.bullets) {
+		if (bullet.visible) {
+			SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
+			SDL_RenderFillRect(renderer, &bullet.rect);
+		}
 	}
-	//for (auto& bullet : bullets.bullets) {
-	//	if (bullet.visible) {
-	//		SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
-	//		SDL_RenderFillRect(renderer, &bullet.rect);
-	//	}
-	//}
 }
 
 inline void render(SDL_Renderer* renderer, AttackingShapes const& attacking_shapes) {

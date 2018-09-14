@@ -18,14 +18,11 @@ struct Bullet {
 
 
 struct Bullets {
-	std::array<Bullet, 5> bullets;
-	decltype(bullets.end()) first = bullets.end();
-	int count = 0;
+	Bullet bullets[5];
 
 	void init();
 	void tick();
 	void fire(float theta);
-	void kill(decltype(bullets.end()));
 };
 
 #endif // BULLET_H
