@@ -1,4 +1,4 @@
- #include "bullet.h"
+#include "bullet.h"
 #include "screen.h"
 
 void Bullet::init(SDL_Point const&center, float theta) {
@@ -6,7 +6,7 @@ void Bullet::init(SDL_Point const&center, float theta) {
 	this->theta = theta;
 
 	int w = this->rect.w;
-    int h = this->rect.h;
+	int h = this->rect.h;
 	// We need pos because SDL_Rect coordinates are ints. 
 	// The change in position per update is < 1 therefore the truncation that 
 	// would occur casting to int would mean the bullets wouldn't go anywhere!
@@ -21,7 +21,7 @@ void Bullet::tick() {
 	// The change in position per update is < 1 therefore the truncation that 
 	// would occur casting to int would mean the bullets wouldn't go anywhere!
 	float dx = static_cast<float>(1.0 * cos(this->theta));
-    float dy = static_cast<float>(1.0 * sin(this->theta));
+	float dy = static_cast<float>(1.0 * sin(this->theta));
 	this->pos.x += dx*1.5;
 	this->pos.y += dy*1.5;
 	this->rect.x = static_cast<int>(this->pos.x);
@@ -36,20 +36,32 @@ void Bullets::init() { }
 
 
 void Bullets::tick() {
-	for (auto i = 0; i < 5; ++i) {
-		if (this->bullets[i].visible) {
-			this->bullets[i].tick();
-		}
+	for (auto it = this->first; it != this->bullets.end(); ++it) {
+		it->tick();
 	}
 }
 
 
 void Bullets::fire(float theta) {
-	// PRATICAL 1: Updating a C-style for loop.
-	for (auto i = 1; i < 5; ++i) {
-		if (this->bullets[i].visible == false) {
-			this->bullets[i].init(gScreen.center, theta);
-			break;
-		}
+	if (count < 5) {
+		count++;
+		// Remember bullets fill up from the back.
+		--(this->first);
+
+		first->init(gScreen.center, theta);
 	}
+
+	//for (auto i = 1; i < 5; ++i) {
+	//	if (this->bullets[i].visible == false) {
+	//		this->bullets[i].init(gScreen.center, theta);
+	//		break;
+	//	}
+	//}
+}
+
+void Bullets::kill(decltype(bullets.end()) it) {
+	// Remember bullets fill up from the back.
+	std::swap(*this->first, *it);
+	this->first = it + 1;
+	--count;
 }
