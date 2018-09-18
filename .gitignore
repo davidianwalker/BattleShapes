@@ -4,3 +4,5 @@ x64
 BattleShapes/x64
 BattleShapes/dll
 BattleShapes/Debug
+*.zip
+libsdl2
