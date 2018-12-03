@@ -48,6 +48,7 @@ dlls = set()
 
 for p in x64:
     dlls = dlls.union(p.glob("**/*.dll"))
+    dlls = dlls.union(p.glob("**/*.lib"))
 
 for dll in dlls:
     print(dll)
