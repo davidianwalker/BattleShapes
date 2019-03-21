@@ -6,3 +6,4 @@ BattleShapes/dll
 BattleShapes/Debug
 *.zip
 libsdl2
+build
